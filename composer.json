@@ -1,0 +1,16 @@
+{
+	"name": "rkr/rpc-generator",
+	"type": "library",
+	"license": "MIT",
+	"require": {
+		"php": ">= 8.0",
+		"rkr/class-finder": "^1.0",
+		"container-interop/container-interop": "^1.1.0",
+		"dv-team/json": "^1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"RpcGenerator\\": "src/"
+		}
+	}
+}
