@@ -4,7 +4,7 @@ namespace RpcGenerator\Attributes;
 
 use Attribute;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_CLASS)]
 class RPCClass {
 	/**
 	 * @param string $module The module name of the RPC class.
