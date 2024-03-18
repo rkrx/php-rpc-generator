@@ -50,14 +50,14 @@ class ClassFactGatheringService {
 				$attribute = $refAttribute->newInstance();
 				$parameters = array_map(static fn($p) => self::transformParameter($attribute, $p), $refMethod->getParameters());
 				$methodName = $attribute->name ?? $methodName;
-			}
 
-			$methods[] = new MethodDefinition(
-				name: $methodName,
-				methodName: $refMethod->getName(),
-				parameters: $parameters,
-				return: $refMethod->getReturnType() !== null ? self::getTypes($refMethod->getReturnType()) : null
-			);
+				$methods[] = new MethodDefinition(
+					name: $methodName,
+					methodName: $refMethod->getName(),
+					parameters: $parameters,
+					return: $refMethod->getReturnType() !== null ? self::getTypes($refMethod->getReturnType()) : null
+				);
+			}
 		}
 
 		return new ClassDefinition(
