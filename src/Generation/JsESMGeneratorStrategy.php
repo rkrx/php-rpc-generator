@@ -31,7 +31,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 					const response = await fetch({$jsonLink}, {
 						method: {$json('POST')},
 						headers: {$json(['Content-Type' => 'application/json', 'accept' => 'application/json'])},
-						body: JSON.stringify({fn: {$target}, params: $mappingStr}),
+						body: JSON.stringify({target: {$target}, params: $mappingStr}),
 					});
 
 					return await response.json();
