@@ -19,7 +19,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			$link = $this->linkGenerator->generateLink($classDefinition, $methodDefinition);
 
 			$jsonLink = JSON::stringify($link);
-			$target = JSON::stringify([explode('\\', $classDefinition->fqClassName), $methodDefinition->name]);
+			$target = JSON::stringify([explode('\\', $classDefinition->fqClassName), $methodDefinition->methodName]);
 			$json = static fn($data) => JSON::stringify($data);
 
 			$paramStr = $this->makeParamStr($methodDefinition->parameters);
