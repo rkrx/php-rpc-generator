@@ -19,6 +19,6 @@ class MethodFacts {
 		public string $className,
 		public string $classMethodName,
 		public ?string $requiredClassRight,
-		public ?string $requiredMethodRight
+		public ?string $requiredClassMethodRight
 	) {}
 }

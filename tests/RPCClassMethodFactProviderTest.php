@@ -20,7 +20,7 @@ class RPCClassMethodFactProviderTest extends TestCase {
 			className: CustomerService::class,
 			classMethodName: 'getAll',
 			requiredClassRight: 'customers',
-			requiredMethodRight: null
+			requiredClassMethodRight: null
 		);
 
 		self::assertEquals($expected, $facts);
