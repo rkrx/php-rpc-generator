@@ -9,6 +9,10 @@ use RpcGenerator\Common\ClassFacts\TypeDefinition;
 use RpcGenerator\Common\StringUtils;
 use RpcGenerator\Generation\Common\LinkInterface;
 
+/**
+ * {@see JsESMGeneratorStrategyTest}
+
+ */
 class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 	public function __construct(private LinkInterface $linkGenerator) {}
 
