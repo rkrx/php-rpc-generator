@@ -8,9 +8,17 @@
 		"container-interop/container-interop": "^1.1.0",
 		"dv-team/json": "^1.0"
 	},
+	"require-dev": {
+		"phpunit/phpunit": "^10.5"
+	},
 	"autoload": {
 		"psr-4": {
 			"RpcGenerator\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"RpcGenerator\\": "tests/"
 		}
 	}
 }
