@@ -56,7 +56,7 @@ class RPCClassMethodFactProvider {
 			module: $classAttribute->module,
 			name: $classAttribute->name ?? $reflectionClass->getShortName(),
 			function: $methodAttribute->name ?? $reflectionMethod->getName(),
-			className: $reflectionClass->getShortName(),
+			className: $reflectionClass->getName(),
 			classMethodName: $reflectionMethod->getName(),
 			requiredClassRight: $classAttribute->requiredRight,
 			requiredMethodRight: $methodAttribute->requiredRight

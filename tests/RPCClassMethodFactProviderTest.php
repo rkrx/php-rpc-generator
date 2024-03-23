@@ -17,7 +17,7 @@ class RPCClassMethodFactProviderTest extends TestCase {
 			module: 'customers',
 			name: 'CustomerService',
 			function: 'getCustomers',
-			className: 'CustomerService',
+			className: CustomerService::class,
 			classMethodName: 'getAll',
 			requiredClassRight: 'customers',
 			requiredMethodRight: null
