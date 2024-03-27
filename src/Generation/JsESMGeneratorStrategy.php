@@ -48,7 +48,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 		}
 
 		$classBody = [];
-		$classBody[] = "export const {$classDefinition->name} = {";
+		$classBody[] = "export default {";
 		$classBody = [...$classBody, implode(",\n\n", $functions)];
 		$classBody[] = "};";
 
