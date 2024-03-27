@@ -11,6 +11,7 @@ use RpcGenerator\Common\ClassFactGatheringService;
 use RpcGenerator\Common\ClassGenerationResult;
 use RpcGenerator\Common\Configuration;
 use RuntimeException;
+use Throwable;
 
 class RPCGenerator {
 	public function __construct(private Configuration $configuration) {}
@@ -32,24 +33,35 @@ class RPCGenerator {
 	 * @return Generator<ClassGenerationResult>
 	 */
 	public function findClassesAndBuildIndex(?string $filePattern = null, string ...$directories) {
-		$index = $this->configuration->indexCache->fetch();
-
-		$result = [];
-
 		$filePattern ??= $this->configuration->filePattern;
 		$classes = $this->findClasses($filePattern, ...$directories);
 		foreach($classes as $file => $className) {
-			if(array_key_exists($file, $index)) {
-				$cachedMTime = $index[$file]['mtime'];
-				filemtime($file);
+			if(!$this->configuration->indexCache->isModified($file)) {
+				try {
+					$classDefinition = $this->configuration->indexCache->getClassDefinition($file);
+					yield new ClassGenerationResult(
+						def: $classDefinition,
+						unmodified: true,
+						body: null
+					);
+					continue;
+				} catch (Throwable $e) {
+				}
 			}
 
 			$classDefinition = ClassFactGatheringService::getFacts($className);
-			$generatorStrategy = $this->configuration->generatorStrategy;
+
+			$this->configuration->indexCache->update($file, $classDefinition);
+
+			if(!count($classDefinition->methods)) {
+				// No accessible methods found
+				continue;
+			}
 
 			yield new ClassGenerationResult(
 				def: $classDefinition,
-				body: $generatorStrategy->generate($classDefinition)
+				unmodified: false,
+				body: $this->configuration->generatorStrategy->generate($classDefinition)
 			);
 		}
 	}
