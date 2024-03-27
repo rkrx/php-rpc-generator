@@ -41,7 +41,7 @@ class RPCGenerator {
 					$classDefinition = $this->configuration->indexCache->getClassDefinition($file);
 					yield new ClassGenerationResult(
 						def: $classDefinition,
-						unmodified: true,
+						modified: false,
 						body: null
 					);
 					continue;
@@ -60,7 +60,7 @@ class RPCGenerator {
 
 			yield new ClassGenerationResult(
 				def: $classDefinition,
-				unmodified: false,
+				modified: true,
 				body: $this->configuration->generatorStrategy->generate($classDefinition)
 			);
 		}

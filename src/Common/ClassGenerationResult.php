@@ -7,7 +7,7 @@ use RpcGenerator\Common\ClassFacts\ClassDefinition;
 class ClassGenerationResult {
 	public function __construct(
 		public ClassDefinition $def,
-		public bool $unmodified,
+		public bool $modified,
 		public ?string $body
 	) {}
 }
