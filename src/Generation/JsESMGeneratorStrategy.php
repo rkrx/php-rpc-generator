@@ -22,9 +22,9 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 		foreach($classDefinition->methods as $methodDefinition) {
 			$link = $this->linkGenerator->generateLink($classDefinition, $methodDefinition);
 
-			$jsonLink = JSON::stringify($link);
-			$target = JSON::stringify([explode('\\', $classDefinition->fqClassName), $methodDefinition->methodName]);
-			$json = static fn($data) => JSON::stringify($data);
+			$jsonLink = self::stringify($link);
+			$target = self::stringify([explode('\\', $classDefinition->fqClassName), $methodDefinition->methodName]);
+			$json = static fn($data) => self::stringify($data);
 
 			$jsDoc = $this->makeJsDoc($methodDefinition->parameters, $methodDefinition->return);
 
@@ -50,7 +50,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 		$classBody = [];
 		$classBody[] = "export const {$classDefinition->name} = {";
 		$classBody = [...$classBody, implode(",\n\n", $functions)];
-		$classBody[] = "}";
+		$classBody[] = "};";
 
 		return sprintf("%s\n", implode("\n\n", $classBody));
 	}
@@ -106,5 +106,10 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			'string' => 'string',
 			default => 'object',
 		};
+	}
+
+	private static function stringify($input) {
+		$result = JSON::stringify($input);
+		return strtr($result, ["'" => "\\'", '"' => "'"]);
 	}
 }
