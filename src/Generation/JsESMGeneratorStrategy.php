@@ -26,16 +26,14 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			$target = JSON::stringify([explode('\\', $classDefinition->fqClassName), $methodDefinition->methodName]);
 			$json = static fn($data) => JSON::stringify($data);
 
-			$paramStr = $this->makeParamStr($methodDefinition->parameters);
-			$mappingStr = $this->makeParamMappingStr($methodDefinition->parameters);
 			$jsDoc = $this->makeJsDoc($methodDefinition->parameters, $methodDefinition->return);
 
 			$body = "
-				async {$methodDefinition->name}({$paramStr}) {
+				async {$methodDefinition->name}(params) {
 					const response = await fetch({$jsonLink}, {
 						method: {$json('POST')},
 						headers: {$json(['Content-Type' => 'application/json', 'accept' => 'application/json'])},
-						body: JSON.stringify({target: {$target}, params: $mappingStr}),
+						body: JSON.stringify({target: {$target}, params: params}),
 					});
 
 					return await response.json();
@@ -59,35 +57,12 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 
 	/**
 	 * @param array<ParameterDefinition> $parameters
-	 * @return string
-	 */
-	private function makeParamStr(array $parameters): string {
-		$result = [];
-		foreach($parameters as $parameter) {
-			$result[] = $parameter->name;
-		}
-		return implode(', ', $result);
-	}
-
-	/**
-	 * @param array<ParameterDefinition> $parameters
-	 * @return string
-	 */
-	private function makeParamMappingStr(array $parameters): string {
-		$result = [];
-		foreach($parameters as $parameter) {
-			$result[] = sprintf('%s: %s', $parameter->name, $parameter->name);
-		}
-		return sprintf('{%s}', implode(', ', $result));
-	}
-
-	/**
-	 * @param array<ParameterDefinition> $parameters
 	 * @param TypeDefinition|null $return
 	 * @return string
 	 */
 	private function makeJsDoc(array $parameters, TypeDefinition|null $return) {
 		$result = ['/**'];
+		$objProperties = [];
 		foreach($parameters as $parameter) {
 			$types = [];
 			if($parameter->typing->nullable) {
@@ -98,9 +73,11 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			}
 			$types = array_unique($types, SORT_STRING);
 			$typeStr = implode('|', $types);
-			$result[] = sprintf(' * @param {%s} %s', $typeStr, $parameter->name);
+			$objProperties[] = sprintf('%s: %s', $parameter->name, $typeStr);
 		}
 
+		// Use extra spaces to be compatible with template engines that use {{ and }} as delimiters
+		$result[] = sprintf(' * @param { { %s } } params', implode(', ', $objProperties));
 		if($return !== null) {
 			$types = [];
 			if($return->nullable) {
@@ -112,7 +89,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			if(count($types)) {
 				$types = array_unique($types, SORT_STRING);
 				$typeStr = implode('|', $types);
-				$result[] = sprintf(' * @return {Promise<%s>}', $typeStr);
+				$result[] = sprintf(' * @return { Promise<%s> }', $typeStr);
 			}
 		}
 
