@@ -30,14 +30,46 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 
 			$body = "
 				async {$methodDefinition->name}(params) {
-					const response = await fetch({$jsonLink}, {
-						method: {$json('POST')},
-						headers: {$json(['Content-Type' => 'application/json', 'accept' => 'application/json'])},
-						body: JSON.stringify({target: {$target}, params: params})
-					});
+					try {
+						const response = await fetch(url, {
+							method: {$json('POST')},
+							headers: {$json(['Content-Type' => 'application/json', 'accept' => 'application/json'])},
+							body: JSON.stringify({target: {$target}, params: params})
+						});
 
-					return await response.json();
-				}";
+						// Check if the response status is in the 4xx or 5xx range
+						if (!response.ok) {
+							// Handling 4xx Client Errors
+							if (response.status >= 400 && response.status < 500) {
+								const errorDetails = await response.json();
+								return Promise.reject({
+									status: response.status,
+									message: response.statusText,
+									details: errorDetails
+								});
+							}
+							// Handling 5xx Server Errors
+							else if (response.status >= 500 && response.status < 600) {
+								const errorDetails = await response.json();
+								return Promise.reject({
+									status: response.status,
+									message: response.statusText,
+									details: errorDetails
+								});
+							}
+						}
+
+						// If the response is okay (2xx status), parse and return the JSON
+						return await response.json();
+					} catch (error) {
+						return Promise.reject({
+							status: 'unknown',
+							message: error.message,
+							details: null
+						});
+					}
+				}
+			";
 
 			$jsDoc = StringUtils::addIndentation($jsDoc);
 
