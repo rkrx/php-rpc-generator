@@ -31,7 +31,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 			$body = "
 				async {$methodDefinition->name}(params) {
 					try {
-						const response = await fetch(url, {
+						const response = await fetch({$jsonLink}, {
 							method: {$json('POST')},
 							headers: {$json(['Content-Type' => 'application/json', 'accept' => 'application/json'])},
 							body: JSON.stringify({target: {$target}, params: params})
