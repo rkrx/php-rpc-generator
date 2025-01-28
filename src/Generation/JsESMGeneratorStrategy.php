@@ -30,7 +30,7 @@ class JsESMGeneratorStrategy implements GeneratorStrategyInterface {
 
 			$body = "
 				async {$methodDefinition->name}(params) {
-					if(typeof params === 'object' && !Array.isArray(params) && params !== null) {
+					if(!(typeof params === 'object' && !Array.isArray(params) && params !== null)) {
 						throw new Error('The params argument must be an object');
 					}
 					try {
