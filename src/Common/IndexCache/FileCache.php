@@ -22,20 +22,20 @@ class FileCache implements IndexCacheInterface {
 		private string $seed = ''
 	) {}
 
-	public function isModified(string $path): bool {
+	public function isModified(string $fqClassName): bool {
 		if($this->cache === null) {
 			$this->cache = $this->loadCache();
 		}
 
-		if(!array_key_exists($path, $this->cache)) {
+		if(!array_key_exists($fqClassName, $this->cache)) {
 			return false;
 		}
 
-		return $this->cache[$path]['mtime'] !== filemtime($path);
+		return $this->cache[$fqClassName]['mtime'] !== filemtime($fqClassName);
 	}
 
-	public function getClassDefinition(string $file): ClassDefinition {
-		$def = $this->cache[$file]['def'] ?? null;
+	public function getClassDefinition(string $fqClassName): ClassDefinition {
+		$def = $this->cache[$fqClassName]['def'] ?? null;
 		if($def === null) {
 			throw new Exception('Invalid class definition');
 		}
@@ -46,12 +46,12 @@ class FileCache implements IndexCacheInterface {
 		throw new Exception('Invalid class definition');
 	}
 
-	public function update(string $path, ClassDefinition $classDefinition): void {
+	public function update(string $fqClassName, ClassDefinition $classDefinition): void {
 		if($this->cache === null) {
 			$this->cache = $this->loadCache();
 		}
 
-		$this->cache[$path] = ['mtime' => filemtime($path), 'def' => serialize($classDefinition)];
+		$this->cache[$fqClassName] = ['mtime' => filemtime($fqClassName), 'def' => serialize($classDefinition)];
 		file_put_contents($this->cacheFilePath, sprintf("<?php return %s;\n", var_export(['seed' => $this->seed, 'cache' => $this->cache], true)));
 	}
 

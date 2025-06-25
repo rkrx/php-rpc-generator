@@ -28,6 +28,46 @@ class RPCGenerator {
 	}
 
 	/**
+	 * @param string ...$filepaths
+	 * @return Generator<ClassGenerationResult>
+	 * @throws \ReflectionException
+	 */
+	public function buildIndexFromFiles(string ...$filepaths): Generator {
+		foreach($filepaths as $filepath) {
+			if(!$this->configuration->indexCache->isModified($filepath)) {
+				$classes = $this->configuration->classFinder->findAllClassesInFile($filepath);
+				foreach($classes as $className) {
+					$classDefinition = $this->configuration->indexCache->getClassDefinition($className);
+					yield new ClassGenerationResult(
+						def: $classDefinition,
+						modified: false,
+						body: null
+					);
+				}
+			}
+
+			$classes = $this->configuration->classFinder->findAllClassesInFile($filepath);
+
+			foreach($classes as $className) {
+				$classDefinition = ClassFactGatheringService::getFacts($className);
+
+				$this->configuration->indexCache->update($className, $classDefinition);
+
+				if(!count($classDefinition->methods)) {
+					// No accessible methods found
+					continue;
+				}
+
+				yield new ClassGenerationResult(
+					def: $classDefinition,
+					modified: true,
+					body: $this->configuration->generatorStrategy->generate($classDefinition)
+				);
+			}
+		}
+	}
+
+	/**
 	 * @param string|null $filePattern
 	 * @param string ...$directories
 	 * @return Generator<ClassGenerationResult>
